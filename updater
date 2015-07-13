@@ -38,6 +38,15 @@ if(cmd == "listPrograms") then
 elseif(cmd == "download") then
 	if(programList[args[2]]) then
 		local handle = http.get(base_url..args[2].."/"..args[3])
-		print(handle.readAll())
+		local content = handle.readLine()
+		if(content=="VERSION UNKNOWN") then error(content) end
+		content = content.."\n"
+		for line in handle.readLine do
+			content = content..line.."\n"
+		end
+		if(not fs.exists(args[2].."_")) then fs.makeDir(args[2].."_") end
+		local handle = fs.open(args[2].."_/"..args[2].."_"..args[3],"w")
+		handle.write(content)
+		handle.close()
 	end
 end
