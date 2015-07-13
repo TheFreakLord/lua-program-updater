@@ -1,1 +1,43 @@
+local version = 10
 
+local base_url = "http://dev.ible.gq/"
+local listprograms = base_url.."listprograms.php"
+local programList = {}
+
+--# Caching the program list for the first time
+local handle = http.get(listprograms)
+for line in handle.readLine do 
+	if(line == "") then break end
+	programList[line] = true
+end
+
+--# Check for an available update
+local handle = http.get(base_url.."updater/checklatest")
+local newVersion = handle.readLine()
+if(newVersion ~= "") then
+	if(tonumber(newVersion) > version) then
+		print("Update available!")
+	end
+end
+
+--handling the input
+local args = {...}
+local cmd = args[1]
+if(cmd == "listPrograms") then
+	if(args[2] == "update") then
+		programList = {}
+		local handle = http.get(listprograms)
+		for line in handle.readLine do 
+			if(line == "") then break end
+			print(line)
+			programList[line] = true
+		end
+	else 
+		for k,v in pairs(programList) do print(k) end
+	end
+elseif(cmd == "download") then
+	if(programList[args[2]]) then
+		local handle = http.get(base_url..args[2].."/"..args[3])
+		print(handle.readAll())
+	end
+end
