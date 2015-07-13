@@ -42,11 +42,19 @@ elseif(cmd == "download") then
 		if(content=="VERSION UNKNOWN") then error(content) end
 		content = content.."\n"
 		for line in handle.readLine do
+			if(line == "<!-- Hosting24 Analytics Code -->") then break end
 			content = content..line.."\n"
 		end
 		if(not fs.exists(args[2].."_")) then fs.makeDir(args[2].."_") end
 		local handle = fs.open(args[2].."_/"..args[2].."_"..args[3],"w")
 		handle.write(content)
 		handle.close()
+	end
+elseif(cmd == "latestversion") then
+	if(programList[args[2]]) then
+		local handle = http.get(base_url..args[2].."/checklatest")
+		local ver = handle.readLine()
+		handle.close()
+		print("The latest stable version of "..args[2].." is"..ver)
 	end
 end
